@@ -26,9 +26,9 @@ public class TaskManagerTest {
         manager.validateAndAddTask(validTask);
 
         assertEquals(1, manager.getTasks().size(), "The task list size should be exactly 1.");
-        assertEquals("Complete Homework", manager.getTasks().get(0).getTitle(), "The stored title should be correct.");
-        assertEquals(Priority.HIGH, manager.getTasks().get(0).getPriority(), "The priority should match.");
-        assertNotNull(manager.getTasks().get(0).getCreatedAt(), "The creation timestamp must be automatically generated.");
+        assertEquals("Complete Homework", manager.getTasks().getFirst().getTitle(), "The stored title should be correct.");
+        assertEquals(Priority.HIGH, manager.getTasks().getFirst().getPriority(), "The priority should match.");
+        assertNotNull(manager.getTasks().getFirst().getCreatedAt(), "The creation timestamp must be automatically generated.");
     }
 
     @Test

@@ -68,7 +68,8 @@ public class TaskApp {
                     refreshListDisplay();
                 }
             } else {
-                JOptionPane.showMessageDialog(mainFrame, "Please select a task to remove.", "Selection Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(mainFrame, "Please select a task to remove.", "Selection Error",
+                        JOptionPane.WARNING_MESSAGE);
             }
         });
 
