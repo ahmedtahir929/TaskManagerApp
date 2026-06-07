@@ -19,7 +19,7 @@ public class TaskApp {
     }
 
     private void createAndShowGUI() {
-        JFrame frame = new JFrame("CleanTask Manager");
+        JFrame frame = new JFrame("Task Manager");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 450);
         frame.setLayout(new BorderLayout(10, 10));
