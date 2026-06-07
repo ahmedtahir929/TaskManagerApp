@@ -1,6 +1,7 @@
 package com.taskmanager;
 
 import com.taskmanager.model.Priority;
+import com.taskmanager.model.Status;
 import com.taskmanager.model.Task;
 import com.taskmanager.model.TaskManager;
 import com.taskmanager.exception.InvalidTaskException;
@@ -72,6 +73,36 @@ public class TaskManagerTest {
         manager.removeTaskFromTracking(0);
 
         assertEquals(0, manager.getTasks().size(), "The active task queue should be empty after removal.");
+    }
+
+    @Test
+    public void testNewTaskDefaultsToPendingStatus() throws InvalidTaskException, DuplicateTaskException {
+        Task testTask = new Task("Submit Code Artifacts", Priority.HIGH);
+        manager.validateAndAddTask(testTask);
+
+        assertEquals(Status.PENDING, manager.getTasks().getFirst().getStatus(), "Fresh tasks must launch under PENDING status flags.");
+    }
+
+    @Test
+    public void testMarkTaskAsCompletedTogglesStatus() throws InvalidTaskException, DuplicateTaskException {
+        Task testTask = new Task("Run Testing Lifecycles", Priority.MEDIUM);
+        manager.validateAndAddTask(testTask);
+
+        Task storedTask = manager.getTasks().getFirst();
+        storedTask.setStatus(Status.COMPLETED);
+
+        assertEquals(Status.COMPLETED, manager.getTasks().getFirst().getStatus(), "The structural task status record must accurately update to COMPLETED.");
+    }
+
+    @Test
+    public void testMarkTaskAsDelayedTogglesStatus() throws InvalidTaskException, DuplicateTaskException {
+        Task testTask = new Task("Refactor Final Module", Priority.LOW);
+        manager.validateAndAddTask(testTask);
+
+        Task storedTask = manager.getTasks().getFirst();
+        storedTask.setStatus(Status.DELAYED);
+
+        assertEquals(Status.DELAYED, manager.getTasks().getFirst().getStatus(), "The structural task status record must accurately update to DELAYED.");
     }
 
     @Test

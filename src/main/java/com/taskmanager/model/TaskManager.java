@@ -8,7 +8,6 @@ import java.util.List;
 
 public class TaskManager {
     private final List<Task> tasks;
-    private static final int MAX_QUEUE_CAPACITY = 10;
 
     public TaskManager() {
         this.tasks = new ArrayList<>();
