@@ -47,7 +47,8 @@ my-task-manager/
 <img width="603" height="691" alt="image" src="https://github.com/user-attachments/assets/0266d321-8916-43ac-8332-9c5f8d31ede7" />
 <img width="606" height="686" alt="image" src="https://github.com/user-attachments/assets/e4f5d882-0655-44ab-9889-30a650a292b6" />
 <img width="603" height="691" alt="image" src="https://github.com/user-attachments/assets/e9bfbcfa-f07c-4ab9-9af3-31ec2c53aa74" />
-![Uploading image.png…]()
+<img width="940" height="583" alt="image" src="https://github.com/user-attachments/assets/faadb616-88f0-4de8-aa95-bdb14c3d42ba" />
+
 
 
 
