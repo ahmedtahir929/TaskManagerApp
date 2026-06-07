@@ -1,26 +1,29 @@
 package com.taskmanager.model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Task {
     private final String title;
     private final Priority priority;
-    private final long delayInSeconds;
     private final LocalDateTime createdAt;
 
-    public Task(String title, Priority priority, long delayInSeconds) {
+    // Clean Date formatter (e.g., "10:15:30" or "2026-06-07 10:15")
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+    public Task(String title, Priority priority) {
         this.title = title;
         this.priority = priority;
-        this.delayInSeconds = delayInSeconds;
         this.createdAt = LocalDateTime.now();
     }
 
     public String getTitle() { return title; }
     public Priority getPriority() { return priority; }
-    public long getDelayInSeconds() { return delayInSeconds; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
     @Override
     public String toString() {
-        return String.format("[%s] %s (Executes in %ds)", priority, title, delayInSeconds);
+        // Updated to dynamically include the formatted timestamp
+        return String.format("[%s] %s (Created at: %s)", priority, title, createdAt.format(TIME_FORMATTER));
     }
 }

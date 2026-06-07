@@ -1,8 +1,10 @@
 package com.taskmanager.ui;
 
+import com.taskmanager.exception.DuplicateTaskException;
+import com.taskmanager.exception.InvalidTaskException;
 import com.taskmanager.model.Priority;
 import com.taskmanager.model.Task;
-import com.taskmanager.exception.InvalidTaskException;
+import com.taskmanager.model.TaskManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,12 +12,15 @@ import java.awt.*;
 public class TaskFormDialog extends JDialog {
     private JTextField titleField;
     private JComboBox<Priority> priorityBox;
-    private JSpinner delaySpinner;
     private Task createdTask;
     private boolean succeeded = false;
+    private final TaskManager taskManager;
 
-    public TaskFormDialog(Frame parent) {
+    public TaskFormDialog(Frame parent, TaskManager taskManager) {
+        // First line MUST be the super constructor call
         super(parent, "Schedule New Task", true);
+        // Bind directly to the master manager reference passed from TaskApp
+        this.taskManager = taskManager;
         initializeForm();
     }
 
@@ -39,15 +44,8 @@ public class TaskFormDialog extends JDialog {
         gbc.gridx = 1;
         add(priorityBox, gbc);
 
-        // Row 2: Delay Timer Spinner
-        gbc.gridx = 0; gbc.gridy = 2;
-        add(new JLabel("Delay (Seconds):"), gbc);
-        delaySpinner = new JSpinner(new SpinnerNumberModel(5, 1, 3600, 1));
-        gbc.gridx = 1;
-        add(delaySpinner, gbc);
-
-        // Row 3: Submission Buttons Panel
-        JButton submitBtn = new JButton("Schedule");
+        // Row 3: Submission Buttons Panel (Renamed label to "Add Task" to match refactor)
+        JButton submitBtn = new JButton("Add Task");
         JButton cancelBtn = new JButton("Cancel");
         JPanel btnPanel = new JPanel();
         btnPanel.add(submitBtn);
@@ -65,20 +63,22 @@ public class TaskFormDialog extends JDialog {
     }
 
     private void handleFormSubmission() {
+        String title = titleField.getText();
+        Priority priority = (Priority) priorityBox.getSelectedItem();
+        Task provisionalTask = new Task(title, priority);
+
         try {
-            String title = titleField.getText().trim();
-            if (title.isEmpty()) {
-                throw new InvalidTaskException("Form validation failed: Title required.");
-            }
+            // This now successfully hits the same data engine used by TaskApp!
+            taskManager.validateAndAddTask(provisionalTask);
 
-            Priority priority = (Priority) priorityBox.getSelectedItem();
-            int delay = (Integer) delaySpinner.getValue();
-
-            createdTask = new Task(title, priority, delay);
+            createdTask = provisionalTask;
             succeeded = true;
             dispose();
+
         } catch (InvalidTaskException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Validation Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
+        } catch (DuplicateTaskException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Duplicate Detected", JOptionPane.WARNING_MESSAGE);
         }
     }
 
