@@ -20,7 +20,7 @@ public class TaskApp {
     private void createAndShowGUI() {
         JFrame mainFrame = new JFrame("Task Queue Dashboard");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(620, 450); // Adjusted sizing to fit all control buttons nicely
+        mainFrame.setSize(620, 450);
         mainFrame.setLayout(new BorderLayout(10, 10));
 
         // Center Area: Active Task List
@@ -29,24 +29,36 @@ public class TaskApp {
         JScrollPane scrollPane = new JScrollPane(taskJList);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Active Tasks"));
 
-        // CUSTOM CELL RENDERER: Handles indexing, green completions, and red delays
+        // Initialize the display state (Will load the "No tasks" message immediately)
+        refreshListDisplay();
+
+        // CUSTOM CELL RENDERER: Handles numbers, states, and the empty placeholder message
         taskJList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                           boolean isSelected, boolean cellHasFocus) {
                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                if (value instanceof Task task) {
+                // 1. Feature Check: If it's our placeholder dummy object
+                if (value == null) {
+                    setText("  No tasks added yet. Click \"New Task...\" to add your first task!");
+                    c.setFont(c.getFont().deriveFont(Font.ITALIC));
+                    c.setForeground(Color.GRAY);
+                    c.setBackground(list.getBackground());
+                    return c;
+                }
 
+                // 2. Regular Task Rendering Logic
+                if (value instanceof Task) {
+                    Task task = (Task) value;
                     setText((index + 1) + ". " + task.toString());
 
-                    // Feature 2 & 3: Apply color tracking blocks based on specific Status states
                     if (task.getStatus() == Status.COMPLETED) {
-                        c.setBackground(new Color(212, 239, 223)); // Soft light green background
-                        c.setForeground(new Color(27, 94, 32));    // Dark green text
+                        c.setBackground(new Color(212, 239, 223)); // Soft light green
+                        c.setForeground(new Color(27, 94, 32));    // Dark green
                     } else if (task.getStatus() == Status.DELAYED) {
-                        c.setBackground(new Color(250, 219, 216));// Soft light red background
-                        c.setForeground(new Color(110, 44, 13));   // Dark red text
+                        c.setBackground(new Color(242, 215, 213)); // Soft light red
+                        c.setForeground(new Color(110, 44, 13));   // Dark red
                     } else if (!isSelected) {
                         c.setBackground(list.getBackground());     // Default fallback
                         c.setForeground(list.getForeground());
@@ -77,33 +89,32 @@ public class TaskApp {
             }
         });
 
-        // ACTION EVENT HANDLER: Toggle Status to COMPLETED
         completeBtn.addActionListener(e -> {
             int selectedIndex = taskJList.getSelectedIndex();
-            if (selectedIndex != -1) {
+            // Secure check: Make sure a valid task index row is chosen (not the placeholder row)
+            if (selectedIndex != -1 && !taskManager.getTasks().isEmpty()) {
                 Task selectedTask = taskJList.getSelectedValue();
-                selectedTask.setStatus(Status.COMPLETED); // Toggle status enum value
-                taskJList.repaint(); // Force GUI to instantly redraw updated colors & status string
+                selectedTask.setStatus(Status.COMPLETED);
+                taskJList.repaint();
             } else {
-                JOptionPane.showMessageDialog(mainFrame, "Please select a task to mark completed.", "Selection Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(mainFrame, "Please select an active task to mark completed.", "Selection Error", JOptionPane.WARNING_MESSAGE);
             }
         });
 
-        // ACTION EVENT HANDLER: Toggle Status to DELAYED
         delayBtn.addActionListener(e -> {
             int selectedIndex = taskJList.getSelectedIndex();
-            if (selectedIndex != -1) {
+            if (selectedIndex != -1 && !taskManager.getTasks().isEmpty()) {
                 Task selectedTask = taskJList.getSelectedValue();
                 selectedTask.setStatus(Status.DELAYED);
                 taskJList.repaint();
             } else {
-                JOptionPane.showMessageDialog(mainFrame, "Please select a task to mark delayed.", "Selection Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(mainFrame, "Please select an active task to mark delayed.", "Selection Error", JOptionPane.WARNING_MESSAGE);
             }
         });
 
         removeBtn.addActionListener(e -> {
             int selectedIndex = taskJList.getSelectedIndex();
-            if (selectedIndex != -1) {
+            if (selectedIndex != -1 && !taskManager.getTasks().isEmpty()) {
                 Task selectedTask = taskJList.getSelectedValue();
                 int confirmResult = JOptionPane.showConfirmDialog(
                         mainFrame,
@@ -118,7 +129,7 @@ public class TaskApp {
                     refreshListDisplay();
                 }
             } else {
-                JOptionPane.showMessageDialog(mainFrame, "Please select a task to remove.", "Selection Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(mainFrame, "Please select an active task to remove.", "Selection Error", JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -130,8 +141,13 @@ public class TaskApp {
 
     private void refreshListDisplay() {
         listModel.clear();
-        for (Task t : taskManager.getTasks()) {
-            listModel.addElement(t);
+        if (taskManager.getTasks().isEmpty()) {
+            // Passing a null element tells our cell renderer to render the placeholder text string safely
+            listModel.addElement(null);
+        } else {
+            for (Task t : taskManager.getTasks()) {
+                listModel.addElement(t);
+            }
         }
     }
 
