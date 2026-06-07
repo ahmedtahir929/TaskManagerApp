@@ -1,93 +1,75 @@
 package com.taskmanager.ui;
 
-import com.taskmanager.model.TaskManager;
-import com.taskmanager.exception.InvalidTaskException;
+import com.taskmanager.model.Task;
+import com.taskmanager.scheduler.TaskSchedulerEngine;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 public class TaskApp {
-    private final TaskManager taskManager;
-    private DefaultListModel<String> listModel;
-    private JList<String> taskList;
-    private JTextField taskField;
+    private final TaskSchedulerEngine schedulerEngine;
+    private DefaultListModel<Task> listModel;
+    private JFrame mainFrame;
 
     public TaskApp() {
-        this.taskManager = new TaskManager();
+        this.schedulerEngine = new TaskSchedulerEngine();
         createAndShowGUI();
     }
 
     private void createAndShowGUI() {
-        JFrame frame = new JFrame("Task Manager");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 450);
-        frame.setLayout(new BorderLayout(10, 10));
+        mainFrame = new JFrame("Advanced Task Scheduler");
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setSize(450, 400);
+        mainFrame.setLayout(new BorderLayout(10, 10));
 
-        //Top Panel: Input Field and Add Button
-        JPanel inputPanel = new JPanel(new BorderLayout(5, 5));
-        taskField = new JTextField();
-        JButton addButton = new JButton("Add Task");
-        inputPanel.add(taskField, BorderLayout.CENTER);
-        inputPanel.add(addButton, BorderLayout.EAST);
-        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
-
-        //Center Panel: Task List Display
+        //Center Area: Active Task Queue List Display
         listModel = new DefaultListModel<>();
-        taskList = new JList<>(listModel);
-        JScrollPane scrollPane = new JScrollPane(taskList);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("My Tasks"));
+        JList<Task> taskJList = new JList<>(listModel);
+        JScrollPane scrollPane = new JScrollPane(taskJList);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Active Scheduled Queue"));
 
-        //Bottom Panel: Remove Button
-        JButton removeButton = new JButton("Remove Selected");
+        // Bottom Dashboard Panel
+        JButton openFormBtn = new JButton("Schedule New Task...");
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        bottomPanel.add(removeButton);
+        bottomPanel.add(openFormBtn);
 
-        // --- EVENT HANDLING ---
-        //Lambda expression acting as an ActionEvent Listener for adding tasks
-        addButton.addActionListener((ActionEvent e) -> handleAddTask());
+        // --- EXTENDED EVENT HANDLING ---
+        openFormBtn.addActionListener(e -> {
+            TaskFormDialog form = new TaskFormDialog(mainFrame);
+            form.setVisible(true); // Halts main thread until hidden/disposed
 
-        //Event listener for removing tasks
-        removeButton.addActionListener((ActionEvent e) -> handleRemoveTask());
+            if (form.isSucceeded()) {
+                Task newTask = form.getCreatedTask();
+                listModel.addElement(newTask);
 
-        //Assemble Frame
-        frame.add(inputPanel, BorderLayout.NORTH);
-        frame.add(scrollPane, BorderLayout.CENTER);
-        frame.add(bottomPanel, BorderLayout.SOUTH);
+                //Send to background executor thread
+                schedulerEngine.scheduleTask(newTask, this::onTaskExecutionTriggered);
+            }
+        });
 
-        frame.setLocationRelativeTo(null); // Center screen
-        frame.setVisible(true);
+        mainFrame.add(scrollPane, BorderLayout.CENTER);
+        mainFrame.add(bottomPanel, BorderLayout.SOUTH);
+        mainFrame.setLocationRelativeTo(null);
+        mainFrame.setVisible(true);
     }
 
-    private void handleAddTask() {
-        String input = taskField.getText();
-        try {
-            //Business Logic Request
-            taskManager.addTask(input);
-            //Sync View with Model
-            listModel.addElement(input.trim());
-            taskField.setText(""); // Clear input field
-        } catch (InvalidTaskException e) {
-            //EXCEPTION HANDLING: Catching custom exceptions and alerting the user
-            JOptionPane.showMessageDialog(null, e.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void handleRemoveTask() {
-        int selectedIndex = taskList.getSelectedIndex();
-        try {
-            //Business Logic Request
-            taskManager.removeTask(selectedIndex);
-            //Sync View with Model
-            listModel.remove(selectedIndex);
-        } catch (InvalidTaskException e) {
-            //EXCEPTION HANDLING
-            JOptionPane.showMessageDialog(null, e.getMessage(), "Selection Error", JOptionPane.WARNING_MESSAGE);
-        }
+    /**
+     * Callback method triggered automatically when a task's background delay timer runs out.
+     */
+    private void onTaskExecutionTriggered(Task completedTask) {
+        //Swing UI update actions must run on the UI Event Dispatch Thread!
+        SwingUtilities.invokeLater(() -> {
+            listModel.removeElement(completedTask);
+            JOptionPane.showMessageDialog(
+                    mainFrame,
+                    "Task Executing Now:\n" + completedTask.getTitle(),
+                    "Task Notification [" + completedTask.getPriority() + "]",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        });
     }
 
     public static void main(String[] args) {
-        //Run UI on the Event Dispatch Thread (Thread-safe practice for Swing)
         SwingUtilities.invokeLater(TaskApp::new);
     }
 }
