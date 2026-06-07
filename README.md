@@ -80,11 +80,13 @@ Running the visual interface dashboard is just as simple:
 The **Task Queue Dashboard** user interface window will instantly pop up on your screen, fully operational and ready to use!
 
 ## Outputs
-<img width="600" height="688" alt="image" src="https://github.com/user-attachments/assets/40bb70cf-64a4-4c82-bb61-31cc65f5c0b9" />
-<img width="603" height="691" alt="image" src="https://github.com/user-attachments/assets/0266d321-8916-43ac-8332-9c5f8d31ede7" />
-<img width="606" height="686" alt="image" src="https://github.com/user-attachments/assets/e4f5d882-0655-44ab-9889-30a650a292b6" />
-<img width="603" height="691" alt="image" src="https://github.com/user-attachments/assets/e9bfbcfa-f07c-4ab9-9af3-31ec2c53aa74" />
-<img width="940" height="583" alt="image" src="https://github.com/user-attachments/assets/faadb616-88f0-4de8-aa95-bdb14c3d42ba" />
+<img width="709" height="971" alt="image" src="https://github.com/user-attachments/assets/25c3228d-aba2-451a-9d95-3c4d7ab0ebd9" />
+<img width="940" height="694" alt="image" src="https://github.com/user-attachments/assets/3ba26cd8-cc9c-41e2-bc4c-6a803e33ee0f" />
+<img width="940" height="691" alt="image" src="https://github.com/user-attachments/assets/388c04d3-1292-41a4-b36d-e88df4e273e4" />
+<img width="926" height="691" alt="image" src="https://github.com/user-attachments/assets/14722c43-42ef-4c10-b26c-72f049df04f1" />
+
+
+
 
 
 
