@@ -51,7 +51,7 @@ Follow these step-by-step instructions to clone, build, and run the application 
 Open your terminal (Command Prompt, PowerShell, or Git Bash) and run the following commands to clone the code and enter the project directory:
 ```bash
 git clone https://github.com/ahmedtahir929/TaskManagerApp.git
-cd Java-Task-Manager
+cd TaskManagerApp
 ```
 
 ### 2. Open the Project in IntelliJ IDEA
