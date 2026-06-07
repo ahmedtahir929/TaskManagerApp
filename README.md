@@ -42,6 +42,43 @@ my-task-manager/
                     └── TaskManagerTest.java           # Automated JUnit 5 test cases
 
 ```
+
+## 🚀 Setup & Execution Instructions
+
+Follow these step-by-step instructions to clone, build, and run the application on your local machine or a university lab computer.
+
+### 1. Clone the Repository
+Open your terminal (Command Prompt, PowerShell, or Git Bash) and run the following commands to clone the code and enter the project directory:
+```bash
+git clone https://github.com/ahmedtahir929/TaskManagerApp.git
+cd Java-Task-Manager
+```
+
+### 2. Open the Project in IntelliJ IDEA
+1. Launch **IntelliJ IDEA**.
+2. Select **File -> Open** (or **Open** on the welcome screen).
+3. Navigate to your cloned `TaskManagerApp` folder and select it.
+
+---
+
+### 3. Run Automated Unit Tests
+You can run the entire test suite directly inside IntelliJ without using terminal commands:
+1. In the Project sidebar on the left, navigate to `src/test/java/com/taskmanager/`.
+2. Right-click on the `TaskManagerTest` file.
+3. Select **Run 'TaskManagerTest'**.
+4. A testing window will pop up at the bottom showing a green checkmark next to all **6 passing test cases**.
+
+---
+
+### 4. Launch the Graphical Application (GUI)
+Running the visual interface dashboard is just as simple:
+1. In the Project sidebar, expand `src/main/java/com/taskmanager/ui/`.
+2. Double-click to open `TaskApp.java`.
+3. Right-click anywhere inside the code editor area.
+4. Select **Run 'TaskApp.main()'**.
+
+The **Task Queue Dashboard** user interface window will instantly pop up on your screen, fully operational and ready to use!
+
 ## Outputs
 <img width="600" height="688" alt="image" src="https://github.com/user-attachments/assets/40bb70cf-64a4-4c82-bb61-31cc65f5c0b9" />
 <img width="603" height="691" alt="image" src="https://github.com/user-attachments/assets/0266d321-8916-43ac-8332-9c5f8d31ede7" />
