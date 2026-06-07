@@ -1,7 +1,10 @@
 package com.taskmanager;
 
+import com.taskmanager.model.Priority;
+import com.taskmanager.model.Task;
 import com.taskmanager.model.TaskManager;
 import com.taskmanager.exception.InvalidTaskException;
+import com.taskmanager.exception.DuplicateTaskException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,42 +15,71 @@ public class TaskManagerTest {
 
     @BeforeEach
     public void setUp() {
-        manager = new TaskManager(); // Fresh instance before every test
+        // Enforces fresh test isolation before every single test run
+        manager = new TaskManager();
     }
 
     @Test
-    public void testAddValidTask() throws InvalidTaskException {
-        manager.addTask("Study Java Exception Handling");
-        assertEquals(1, manager.getTasks().size());
-        assertTrue(manager.getTasks().contains("Study Java Exception Handling"));
+    public void testAddValidTaskInstantly() throws InvalidTaskException, DuplicateTaskException {
+        Task validTask = new Task("Complete Homework", Priority.HIGH);
+
+        manager.validateAndAddTask(validTask);
+
+        assertEquals(1, manager.getTasks().size(), "The task list size should be exactly 1.");
+        assertEquals("Complete Homework", manager.getTasks().get(0).getTitle(), "The stored title should be correct.");
+        assertEquals(Priority.HIGH, manager.getTasks().get(0).getPriority(), "The priority should match.");
+        assertNotNull(manager.getTasks().get(0).getCreatedAt(), "The creation timestamp must be automatically generated.");
     }
 
     @Test
-    public void testAddEmptyTaskThrowsException() {
+    public void testEmptyTaskTitleThrowsInvalidTaskException() {
+        // Enforces validation pass against titles made entirely of blank spaces
+        Task blankTask = new Task("     ", Priority.MEDIUM);
+
         assertThrows(InvalidTaskException.class, () -> {
-            manager.addTask("   "); // Testing whitespace trimming optimization
-        });
+            manager.validateAndAddTask(blankTask);
+        }, "An empty or whitespace-only task title must trigger an InvalidTaskException.");
     }
 
     @Test
-    public void testAddDuplicateTaskThrowsException() throws InvalidTaskException {
-        manager.addTask("Refactor Code");
+    public void testNullTaskTitleThrowsInvalidTaskException() {
+        Task nullTitleTask = new Task(null, Priority.LOW);
+
         assertThrows(InvalidTaskException.class, () -> {
-            manager.addTask("Refactor Code");
-        });
+            manager.validateAndAddTask(nullTitleTask);
+        }, "A null task title must trigger an InvalidTaskException.");
     }
 
     @Test
-    public void testRemoveTaskSuccessfully() throws InvalidTaskException {
-        manager.addTask("Submit Assignment");
-        manager.removeTask(0);
-        assertEquals(0, manager.getTasks().size());
+    public void testDuplicateTaskNameThrowsException() throws InvalidTaskException, DuplicateTaskException {
+        Task task1 = new Task("Review Code", Priority.MEDIUM);
+        // Case-insensitivity check and surrounding padding whitespace verification
+        Task duplicateTask = new Task("  review code  ", Priority.LOW);
+
+        manager.validateAndAddTask(task1);
+
+        assertThrows(DuplicateTaskException.class, () -> {
+            manager.validateAndAddTask(duplicateTask);
+        }, "Adding a task with an identical name must trigger a DuplicateTaskException.");
     }
 
     @Test
-    public void testRemoveInvalidIndexThrowsException() {
-        assertThrows(InvalidTaskException.class, () -> {
-            manager.removeTask(99); // Index out of bounds verification
-        });
+    public void testRemoveTaskFromQueueSuccessfully() throws InvalidTaskException, DuplicateTaskException {
+        Task sampleTask = new Task("Submit Project Assignment", Priority.HIGH);
+        manager.validateAndAddTask(sampleTask);
+
+        // Remove item from tracked array position index
+        manager.removeTaskFromTracking(0);
+
+        assertEquals(0, manager.getTasks().size(), "The active task queue should be empty after removal.");
+    }
+
+    @Test
+    public void testRemoveTaskWithInvalidIndexDoesNotCrash() {
+        // Validates that safe index bounds checks don't throw unexpected runtime out-of-bounds crashes
+        assertDoesNotThrow(() -> {
+            manager.removeTaskFromTracking(99);
+            manager.removeTaskFromTracking(-1);
+        }, "Removing an invalid index must be ignored safely without crashing the system.");
     }
 }

@@ -48,9 +48,25 @@ public class TaskApp {
 
         removeBtn.addActionListener(e -> {
             int selectedIndex = taskJList.getSelectedIndex();
+
+            // 1. Guard Condition: Check if a task is actually selected
             if (selectedIndex != -1) {
-                taskManager.removeTaskFromTracking(selectedIndex);
-                refreshListDisplay();
+                Task selectedTask = taskJList.getSelectedValue();
+
+                // 2. Open Confirmation Dialog
+                int confirmResult = JOptionPane.showConfirmDialog(
+                        mainFrame,
+                        "Are you sure you want to remove this task:\n\"" + selectedTask.getTitle() + "\"",
+                        "Confirm Deletion",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                // 3. Process the event response (YES_OPTION means the user clicked 'Yes')
+                if (confirmResult == JOptionPane.YES_OPTION) {
+                    taskManager.removeTaskFromTracking(selectedIndex);
+                    refreshListDisplay();
+                }
             } else {
                 JOptionPane.showMessageDialog(mainFrame, "Please select a task to remove.", "Selection Error", JOptionPane.WARNING_MESSAGE);
             }
